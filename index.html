@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Conducteur d'animation — table ronde Keolis Tours x Archery Data, matinée intermodalité SNCF Gares & Connexions, 17 septembre 2026, Tours.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#00205B">
+<title>Conducteur Keolis × Archery</title>
+<style>
+  /* =========================================================
+     Table ronde Keolis Tours × Archery Data — 17/09 — Tours
+     Structure et contenus repris du script de Stéphane et
+     Julien (« Table ronde 11h30.docx »), sans reformulation.
+     Une seule logique de couleur, partout :
+       ambre = ce que dit Mathieu
+       bleu  = ce que disent Stéphane et Julien
+       gris  = changement de slide
+     Le fond des segments reste neutre : la couleur ne sert
+     qu'à distinguer les prises de parole.
+     Fichier unique, zéro dépendance. Thème : suit l'OS.
+     ========================================================= */
+
+  :root{
+    color-scheme:light dark;
+    --ground:#F6F7FA; --surface:#FFFFFF; --surface-2:#EFF1F6;
+    --ink:#1E173C; --ink-soft:#5B5470; --ink-faint:#8A839E;
+    --primary:#00205B; --primary-ink:#00205B; --primary-tint:#E8EEF7;
+    --or:#F3BA00; --or-ink:#6B5000; --or-tint:#FDF3D8;
+    --ciel:#A4C8E1;
+    --on-primary:#FFFFFF;
+    --glass:rgba(255,255,255,.62);
+    --keybg:#DCE7F4;
+    --font:'Avenir Next','Avenir','Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --r:8px; --r-pill:9999px;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#12102A; --surface:#1E173C; --surface-2:#2A2254;
+      --ink:#F3F1F8; --ink-soft:#B6AFCC; --ink-faint:#8B84A3;
+      --primary:#A4C8E1; --primary-ink:#CFE2F1; --primary-tint:#1C2A4A;
+      --or:#F3BA00; --or-ink:#F7D877; --or-tint:#3A2E0E;
+      --on-primary:#12102A; --glass:rgba(255,255,255,.07);
+      --keybg:#25375C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#12102A; --surface:#1E173C; --surface-2:#2A2254;
+    --ink:#F3F1F8; --ink-soft:#B6AFCC; --ink-faint:#8B84A3;
+    --primary:#A4C8E1; --primary-ink:#CFE2F1; --primary-tint:#1C2A4A;
+    --or:#F3BA00; --or-ink:#F7D877; --or-tint:#3A2E0E;
+    --on-primary:#12102A; --glass:rgba(255,255,255,.07);
+    --keybg:#25375C;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--font); font-weight:400; font-size:17px; line-height:1.45;
+  }
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  .wrap{max-width:720px; margin:0 auto; padding-inline:16px; padding-block:0 40px}
+
+  .bar{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+    background:var(--primary-tint); border-radius:0 0 var(--r) var(--r);
+    padding:10px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .bar-now{font-weight:500; font-size:15px; color:var(--primary-ink); font-variant-numeric:tabular-nums}
+  .bar-seg{
+    flex:1 1 130px; min-width:0; font-size:14px; font-weight:300; color:var(--ink-soft);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .btn{
+    font-family:var(--font); font-size:13px; font-weight:500; letter-spacing:.3px;
+    background:var(--primary); color:var(--on-primary); padding:6px 12px;
+    border:none; border-radius:var(--r-pill); cursor:pointer;
+  }
+  .btn.ghost{background:transparent; color:var(--primary-ink); padding:6px 6px}
+  .btn:focus-visible{outline:2px solid var(--or); outline-offset:2px}
+
+  header.top{padding-block:20px 18px}
+  .eyebrow{
+    font-size:12px; font-weight:500; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--ink-faint); margin:0 0 8px;
+  }
+  h1{margin:0 0 12px; font-size:29px; line-height:1.1; font-weight:500; letter-spacing:-.4px; text-wrap:balance}
+  .facts{display:flex; flex-wrap:wrap; gap:6px}
+  .fact{
+    font-size:13px; font-weight:500; padding:5px 11px; border-radius:var(--r-pill);
+    background:var(--surface-2); color:var(--ink-soft); font-variant-numeric:tabular-nums;
+  }
+  .fact.hot{background:var(--or-tint); color:var(--or-ink)}
+
+  .slidecue{
+    display:flex; align-items:center; gap:12px; margin:24px 0 10px;
+    background:var(--surface-2); border-radius:var(--r); padding:10px 14px;
+  }
+  .slidecue .num{
+    flex:0 0 auto; width:28px; height:28px; border-radius:var(--r-pill);
+    background:var(--primary); color:var(--on-primary); font-weight:500; font-size:15px;
+    display:grid; place-items:center;
+  }
+  .slidecue .txt{font-size:14px; font-weight:500; color:var(--primary-ink)}
+  .slidecue .txt em{display:block; font-style:normal; font-weight:300; color:var(--ink-soft); font-size:13px; margin-top:1px}
+
+  .seg{background:var(--surface); border-radius:var(--r); margin-bottom:10px}
+  .seg.live{box-shadow:inset 0 0 0 3px var(--or)}
+  .seg-head{display:flex; align-items:baseline; gap:11px; padding:14px 16px; cursor:pointer; user-select:none}
+  .seg-head:focus-visible{outline:2px solid var(--or); outline-offset:-2px}
+  .clk{
+    flex:0 0 auto; font-size:17px; font-weight:500; color:var(--primary-ink);
+    font-variant-numeric:tabular-nums; min-width:52px;
+  }
+  .seg-t{flex:1 1 auto; min-width:0}
+  .seg-t h3{margin:0; font-size:17px; font-weight:500; line-height:1.25}
+  .seg-meta{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
+  .tag{
+    font-size:11px; font-weight:500; letter-spacing:.7px; text-transform:uppercase;
+    padding:3px 8px; border-radius:var(--r-pill); background:var(--surface-2); color:var(--ink-faint);
+  }
+  .tag.toi{background:var(--or); color:#3A2E0E}
+  .tag.dur{background:transparent; color:var(--ink-faint); padding-inline:0; letter-spacing:.4px; text-transform:none; font-weight:300}
+  .chev{flex:0 0 auto; color:var(--ink-faint); font-size:14px; transition:transform .18s ease; margin-top:2px}
+  .seg[data-open="1"] .chev{transform:rotate(90deg)}
+  .seg-body{padding:0 16px 16px; display:none}
+  .seg[data-open="1"] .seg-body{display:block}
+
+  /* ce que dit Mathieu — toujours ambre, partout */
+  .say{background:var(--or-tint); border-radius:var(--r); padding:14px 15px; margin-bottom:10px}
+  .say p{margin:0 0 10px; font-size:18px; line-height:1.5; font-weight:300; color:var(--ink)}
+  .say p:last-child{margin-bottom:0}
+  .say p strong{font-weight:500}
+  .ask{background:var(--or-tint); border-radius:var(--r); padding:13px 15px; margin-bottom:10px}
+  .ask span{font-size:19px; font-weight:400; line-height:1.4; display:block; color:var(--ink)}
+  .ask span::before{content:'« '}
+  .ask span::after{content:' »'}
+
+  /* ce qu'ils disent — verbatim de leur script */
+  .cue{background:var(--primary-tint); border-radius:var(--r); padding:13px 15px; margin-bottom:10px}
+  .who{
+    font-size:11px; font-weight:500; letter-spacing:1.1px; text-transform:uppercase;
+    color:var(--primary-ink); margin:0 0 8px;
+  }
+  .cue p{margin:0 0 7px; font-size:15px; font-weight:300; line-height:1.45; color:var(--ink-soft)}
+  .cue p:last-child{margin-bottom:0}
+  .cue ul{margin:0 0 7px; padding-left:18px; display:flex; flex-direction:column; gap:5px}
+  .cue ul:last-child{margin-bottom:0}
+  .cue ul ul{margin:5px 0 0}
+  .cue li{font-size:15px; font-weight:300; line-height:1.45; color:var(--ink-soft)}
+  .cue li::marker{color:var(--ciel)}
+  .cue .sub{font-size:13px; color:var(--ink-faint)}
+  .key{
+    background:var(--keybg); border-radius:var(--r); padding:11px 14px; margin:0 0 8px;
+    font-size:15px; font-weight:400; line-height:1.45; color:var(--ink);
+  }
+  .key:last-child{margin-bottom:0}
+  .step{font-weight:500; color:var(--ink); font-size:15px; margin:10px 0 5px}
+  .trans{
+    font-size:13px; font-weight:500; letter-spacing:.8px; text-transform:uppercase;
+    color:var(--ink-faint); margin:12px 0 6px;
+  }
+
+  .end{background:var(--primary); color:var(--on-primary); border-radius:var(--r); padding:18px 16px; margin-top:24px; text-align:center}
+  .end .h{font-size:22px; font-weight:500; font-variant-numeric:tabular-nums}
+  .end .p{font-size:15px; font-weight:300; margin-top:5px; opacity:.85}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media (max-width:420px){
+    h1{font-size:24px}
+    .say p{font-size:17px}
+    .ask span{font-size:18px}
+    .clk{font-size:16px; min-width:47px}
+    .seg-head{padding:13px 13px}
+    .seg-body{padding:0 13px 14px}
+  }
+  @media print{
+    .bar{display:none}
+    .seg .seg-body{display:block!important}
+    .seg,.say,.ask,.cue,.key,.slidecue{background:#fff!important; color:#000!important}
+    body{background:#fff}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-now" id="clock">--h--</span>
+  <span class="bar-seg" id="nowseg">Le segment en cours s'allumera tout seul.</span>
+  <button class="btn" id="recal" type="button">Recaler</button>
+  <button class="btn ghost" id="toggleAll" type="button">Tout ouvrir</button>
+</div>
+
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Jeudi 17 septembre · Waza Coworking, Tours</p>
+    <h1>Table ronde Keolis&nbsp;Tours × Archery&nbsp;Data</h1>
+    <div class="facts">
+      <span class="fact hot">11h50 → 12h25</span>
+      <span class="fact">35 min</span>
+      <span class="fact">4 slides</span>
+    </div>
+  </header>
+
+  <div class="slidecue"><span class="num">1</span><span class="txt">Slide 1<em>Titre — Keolis × Archery Data &amp; Analytics</em></span></div>
+
+  <article class="seg mine" data-i="0" data-open="1">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>11h50</span>
+      <span class="seg-t">
+        <h3>Cadrage de la séquence</h3>
+        <span class="seg-meta"><span class="tag toi">Toi</span><span class="tag dur">2 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="say">
+        <p>Mathieu Ribourg, Fabrique de l'Adoption Numérique, e.SNCF Solutions. J'accompagne les métiers sur le numérique en Bretagne, Pays de la Loire et Centre-Val de Loire.</p>
+        <p><strong>EZYmob, annoncée au programme, n'a pas pu se libérer</strong> — on aura donc plus de temps pour échanger.</p>
+        <p>Pour cette séquence, je ne suis pas allé chercher dans un catalogue de prestataires. <strong>Je suis allé dans l'écosystème numérique de cette région</strong>, qui est beaucoup plus dense qu'on ne le croit, et j'ai appelé des gens.</p>
+        <p>Résultat : deux acteurs tourangeaux. <strong>Keolis Tours</strong>, et <strong>Archery Data &amp; Analytics</strong>, treize personnes. Et comme le Groupe SNCF, ils sont engagés dans <strong>Digital Loire Valley</strong>. Nous sommes trois acteurs du même écosystème territorial — et c'est exactement ce qui rend ce genre de projet possible.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="seg" data-i="1">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>11h52</span>
+      <span class="seg-t">
+        <h3>1. Introduction</h3>
+        <span class="seg-meta"><span class="tag toi">Toi</span><span class="tag dur">1 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="say">
+        <p>Le sujet qui nous occupe : <strong>comment la Data peut améliorer les mobilités ?</strong> Et on va le prendre par le concret, avec un retour d'expérience Keolis × Archery.</p>
+        <p>Stéphane, Julien — vingt secondes chacun pour vous présenter.</p>
+      </div>
+      <div class="cue">
+        <p class="who">Stéphane — 20 sec</p>
+        <p>Qui est Keolis Tours : la société exploitant le réseau de trams et bus de Tours (sous la marque Fil Bleu) – Acteur de la mobilité tourangelle.</p>
+      </div>
+      <div class="cue">
+        <p class="who">Julien — 20 sec</p>
+        <p>Archery : cabinet tourangeau Data &amp; IA (13 personnes).</p>
+        <p>Positionnement : Data et LowCode (Développement), majoritairement avec des technologie Microsoft.</p>
+        <div class="key">➡ « Notre métier n'est pas de vendre de la technologie, mais de résoudre des problématiques métiers grâce à la donnée. »</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="seg mine" data-i="2">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>11h53</span>
+      <span class="seg-t">
+        <h3>2. Le constat et la problématique</h3>
+        <span class="seg-meta"><span class="tag toi">Ta question</span><span class="tag dur">5 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="ask"><span>Alors commençons par le début, parce que vous ne vous êtes pas trouvés par hasard. Stéphane, quelle est l'origine de votre partenariat ?</span></div>
+      <div class="cue">
+        <p class="who">Stéphane</p>
+        <p>Tout commence par une problématique :</p>
+        <ul>
+          <li>Beaucoup d'outils métiers différents utilisés par de nombreux services dans l'entreprise, qui génèrent de grande quantité de données, toutes pertinentes pour quelqu'un.</li>
+          <li>Ces données sont de 2 natures : celles pour exploiter le réseau de transport, et celles pour le reporting.</li>
+          <li>Or, pour les systèmes d'exploitation, les données sont souvent très techniques et verbeuses.</li>
+          <li>Mais, pour le reporting, les métiers ont besoin de données plus simples et compréhensibles (de « données objets »), facilement croisables entre elles.</li>
+          <li>Dans cette situation, le « tout-en-un » rend difficile la valorisation des données pour nos métiers.</li>
+          <li>Sachant que nos métiers sont de plus en plus demandeurs d'indicateurs, qu'ils font parfois déjà dans leur coin avec leurs données. Très souvent, ils passent plus de temps à réaliser leur rapport qu'à l'analyser.</li>
+          <li>C'est pourquoi nous avons fait le choix de séparer les 2 univers.</li>
+        </ul>
+        <p class="trans">Transition — Stéphane</p>
+        <p>Pour nous accompagner dans ce chantier, nous avons d'abord fait appel à Archery pour réaliser un audit et déterminer les technologies à utiliser.</p>
+      </div>
+      <div class="cue">
+        <p class="who">Julien — pourquoi un audit ?</p>
+        <div class="key">➡ « Avant de construire et proposer quoi que ce soit, nous avons cherché à comprendre. »</div>
+        <p class="step">1. Comprendre le métier</p>
+        <ul>
+          <li>Échanger avec l'ensemble des acteurs du projet.</li>
+          <li>Comprendre les usages et les besoins.</li>
+          <li>Prendre en compte la richesse des métiers concernés : exploitation, ponctualité, validation, fraude, etc.</li>
+        </ul>
+        <div class="key">➡ « On part du besoin métier, puis on choisit la technologie adaptée. »</div>
+        <p class="step">2. Comprendre l'existant</p>
+        <ul>
+          <li>Analyser un écosystème technique complexe avec de nombreuses sources de données.</li>
+          <li>Comprendre les contraintes liées à 13 ans d'historique, aux migrations et aux différents modes de fonctionnement des outils.</li>
+          <li>Identifier les règles de gestion et les dépendances entre systèmes.</li>
+        </ul>
+        <p class="step">3. Définir une trajectoire réaliste</p>
+        <ul>
+          <li>Valider la vision de Keolis sur l'organisation des données.</li>
+          <li>Définir une architecture capable de répondre aux besoins actuels et futurs.</li>
+          <li>Poser les bases d'une démarche industrialisable et réplicable à d'autres usages.</li>
+        </ul>
+        <p class="trans">Transition</p>
+        <div class="key">➡ « Cet audit a permis d'aligner les besoins de Keolis, notre compréhension des enjeux et la trajectoire du projet. C'est ce qui a conduit au lancement de la plateforme Data. »</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="seg mine" data-i="3">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>11h58</span>
+      <span class="seg-t">
+        <h3>3. Quel est l'enjeu ?</h3>
+        <span class="seg-meta"><span class="tag toi">Ta question</span><span class="tag dur">3 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="ask"><span>On a bien le point de départ, et l'audit qui a suivi. Stéphane, et quels sont les enjeux de ce projet ?</span></div>
+      <div class="cue">
+        <p class="who">Stéphane</p>
+        <div class="key">➡ « L'objectif était de passer d'une multitude de données techniques à une information exploitable par les métiers. »</div>
+        <ul>
+          <li>Centraliser et rendre accessible toutes les données de reporting, et être indépendant des systèmes.</li>
+          <li>Garantir la cohérence et la qualité des données.</li>
+          <li>Vulgariser des données (verbatim commun entre les métiers et même de l'entreprise).</li>
+          <li>Pouvoir produire facilement des dashboard / BI sur ces données.</li>
+          <li>Pouvoir connecter d'autres systèmes de Datavisualisation.</li>
+        </ul>
+        <p class="trans">Transition — Stéphane</p>
+        <p>Pour construire tout ça, Archery nous accompagne : plus de cerveaux, un regard neuf, une cible construite ensemble.</p>
+      </div>
+      <div class="cue">
+        <p class="who">Julien</p>
+        <p>Notre rôle a alors été de transformer cette ambition en une feuille de route concrète.</p>
+        <ul>
+          <li>Apporter une expertise Data pour sécuriser les choix via les éléments identifiés pendant l'Audit.</li>
+          <li>Proposer une trajectoire réaliste, adaptée aux enjeux de Keolis.</li>
+          <li>Identifier une solution technique pertinente : ici celle qui sera retenue sera <b>Microsoft Fabric</b>, pour répondre aux enjeux de manipulation de données en très grand volume, faciliter le découpage des données par domaine métier, et permettre aux équipes Keolis Tours de monter en compétence facilement, les équipes ayant déjà des connaissances sur des outils tels que PowerBI pour la partie reporting.</li>
+          <li>Faire avancer le projet malgré les contraintes opérationnelles du quotidien.</li>
+        </ul>
+        <div class="key">➡ « Le rôle d'Archery était d'accélérer, structurer et sécuriser la démarche. »</div>
+      </div>
+    </div>
+  </article>
+
+  <div class="slidecue"><span class="num">2</span><span class="txt">Slide 2<em>Analyse des données à grande échelle — appelée par Stéphane dans cette partie</em></span></div>
+
+  <article class="seg mine" data-i="4">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>12h01</span>
+      <span class="seg-t">
+        <h3>4. Ce qu'on a construit ensemble</h3>
+        <span class="seg-meta"><span class="tag toi">Ta question</span><span class="tag dur">6 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="ask"><span>Venons-en au concret, parce qu'on va enfin voir de quoi on parle à l'écran. Julien, quel est le résultat de cette collaboration ?</span></div>
+      <div class="cue">
+        <p class="who">Julien</p>
+        <div class="key">➡ « La difficulté n'était pas de construire une plateforme Data. La difficulté était de rendre cohérentes des données provenant de nombreux systèmes qui n'avaient pas été conçus pour être analysés ensemble. »</div>
+        <ul>
+          <li>Une collecte standardisée : mise en place de flux commun, standardisé, pour éviter les multiplicités techniques et de gestion chronophage.</li>
+          <li>Restructuration des données, regrouper les notions métiers ensemble à travers une organisation orientée pour de l'analyse et les besoins terrains.</li>
+          <li>Des moyens de contrôles de la qualité de la donnée :
+            <ul>
+              <li class="sub">Détection des données manquantes dans les remontées des systèmes.</li>
+              <li class="sub">Contrôle de cohérence entre différentes sources décrivant la même activité.</li>
+              <li class="sub">Contrôle de la complétude des données avant leur mise à disposition dans les rapports.</li>
+              <li class="sub">Écart important entre les systèmes (projection vs réalisée).</li>
+            </ul>
+          </li>
+          <li>Des moyens de correction / amendement des données, identifiables directement sur les dashboard (Commentaires) :
+            <ul>
+              <li class="sub">Permettre aux équipes d'intégrer des données pour permettre des modifications, des rattrapages lors des crash ou d'évènement qui casse l'ensemble des projections (grève, neige etc.).</li>
+              <li class="sub">Garder une traçabilité complète des actions sur les données, chaque modification est associée à une explication technique et métier.</li>
+            </ul>
+          </li>
+          <li>Un univers industrialisé pour le reporting : 3 environnements et processus de déploiement.
+            <ul>
+              <li class="sub">Facilitation de la maintenance et des évolutions futures.</li>
+              <li class="sub">Historiquement : le reporting est branché sur la production directement.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="cue">
+        <p class="who">Stéphane</p>
+        <p>Nous avons aujourd'hui :</p>
+        <ul>
+          <li>Une collecte standardisée et des données de qualité.</li>
+          <li>Une organisation des données par thématiques métiers.</li>
+          <li>La réalisation de rapports Power BI (en cours) et de flux pour des outils de datavisualisation (en cours).</li>
+        </ul>
+        <p><b>→ Slide « Analyse des données à grande échelle »</b></p>
+        <div class="key">➡ « Notre objectif était simple : que chacun regarde la même information et arrive à la même conclusion. »</div>
+        <div class="key">➡ « Ce travail est souvent invisible, mais c'est lui qui conditionne toute la valeur future de la plateforme. »</div>
+        <div class="key">➡ « Si le sujet était simple, il aurait probablement déjà été traité en interne. »</div>
+        <div class="key">➡ « Ne pas sous-estimer la quantité de travail que représente ce type de sujet. »</div>
+      </div>
+    </div>
+  </article>
+
+  <div class="slidecue"><span class="num">3</span><span class="txt">Slide 3<em>Boussole de la Data et de l'IA — les strates, du socle à la valeur métier</em></span></div>
+
+  <article class="seg mine" data-i="5">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>12h07</span>
+      <span class="seg-t">
+        <h3>5. Valeur pour la mobilité</h3>
+        <span class="seg-meta"><span class="tag toi">Ta question</span><span class="tag dur">1 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="say">
+        <p>Un mot pour raccrocher notre matinée. Vous parlez de tram et de bus, nous on parle de gares — mais Tours, c'est d'abord l'endroit où les trois se croisent. <strong>Un pôle d'échange.</strong> Et ce que vous venez de décrire entre deux organisations voisines, c'est exactement ce qui nous attend entre opérateurs.</p>
+      </div>
+      <div class="ask"><span>Du coup je suis curieux, Stéphane : qu'est-ce que ça change d'avoir eu un partenaire à vingt minutes de vos bureaux, plutôt qu'un grand cabinet parisien ?</span></div>
+      <div class="cue">
+        <p class="who">Stéphane</p>
+        <ul>
+          <li>Une vision plus cohérente et transverse de l'activité.</li>
+          <li>Une meilleure capacité à identifier et analyser les phénomènes d'exploitation, avec un contexte élargi.</li>
+          <li>Moins de temps consacré à rechercher ou consolider l'information.</li>
+          <li>Plus de temps consacré à l'analyse et à l'action.</li>
+        </ul>
+      </div>
+      <div class="cue">
+        <p class="who">Julien — message clé</p>
+        <p>Mettre en place l'ensemble des briques technologiques pour permettre l'exploitation des données par Keolis Tours.</p>
+      </div>
+    </div>
+  </article>
+
+  <div class="slidecue"><span class="num">4</span><span class="txt">Slide 4<em>« Construire les fondations Data avant de faire de l'IA » — c'est « Sans locomotive Data, l'IA reste à quai ». Appelée ici par leur script, elle reste jusqu'à la fin.</em></span></div>
+
+  <article class="seg mine" data-i="6">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>12h08</span>
+      <span class="seg-t">
+        <h3>6. Ouverture IA</h3>
+        <span class="seg-meta"><span class="tag toi">Ta question</span><span class="tag dur">3 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="ask"><span>Il reste le sujet que tout le monde attend depuis ce matin. Julien, Stéphane — et l'IA dans tout ça ?</span></div>
+      <div class="cue">
+        <p class="who">Stéphane</p>
+        <p>Pour moi, l'IA a un rôle important dans notre reporting :</p>
+        <ul>
+          <li>Tout d'abord, pour requalifier facilement des données qui n'arrivent pas à rentrer dans les « bonnes cases ».</li>
+          <li>Mais surtout, pour analyser plus rapidement et efficacement des situations complexes, voire les prédire !</li>
+        </ul>
+      </div>
+      <div class="cue">
+        <p class="who">Julien</p>
+        <p>Aujourd'hui, nous construisons les fondations :</p>
+        <ul>
+          <li>des données fiables</li>
+          <li>un langage commun</li>
+          <li>une plateforme industrialisée et qu'on peut faire évoluer à l'envie en fonction des nouveaux besoins</li>
+        </ul>
+        <p>Demain, ce socle pourra permettre :</p>
+        <ul>
+          <li>d'automatiser davantage certains contrôles
+            <ul><li class="sub">Comme déjà expliqué, identifier et obtenir de la donnée de qualité ou exploitable pour des analyses est un travail permanent : les outils évoluent, les usages également.</li></ul>
+          </li>
+          <li>d'interroger les données en langage naturel
+            <ul><li class="sub">Permettre à des personnes d'accéder facilement et rapidement à des informations.</li></ul>
+          </li>
+          <li>d'anticiper certains phénomènes d'exploitation
+            <ul><li class="sub">On parle plus de Data Science, avec la capacité à prédire des phénomènes ou leurs impacts sur le réseau.</li></ul>
+          </li>
+        </ul>
+        <p>C'est un sujet vaste où je pense que les métiers en interne chez Keolis Tours ont des usages par dizaines une fois le socle posé.</p>
+        <div class="key">➡ « L'intelligence artificielle n'est pas le point de départ du projet. C'est une étape qui devient possible une fois les fondations Data en place. »</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="seg mine" data-i="7">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>12h11</span>
+      <span class="seg-t">
+        <h3>Conclusion</h3>
+        <span class="seg-meta"><span class="tag toi">Ta chute</span><span class="tag dur">1 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="cue">
+        <p class="who">Stéphane</p>
+        <ul>
+          <li>Projet toujours en cours.</li>
+          <li>Continuer à enrichir ce grand entrepôt de connaissance avec d'autres données métiers.</li>
+        </ul>
+      </div>
+      <div class="cue">
+        <p class="who">Julien</p>
+        <p>Archery accompagne : la collecte, la qualité, la valorisation, les futurs usages IA.</p>
+        <p>Expertise fonctionnelle, ou à minima une capacité à comprendre les problématiques opérationnelles dans le monde du transport, pour accompagner au mieux nos clients et leurs projets dans ce secteur.</p>
+      </div>
+      <div class="say">
+        <p>Merci à vous deux. J'en retiens deux choses.</p>
+        <p>La première est de vous : <strong>la vraie innovation n'est pas l'IA. La vraie innovation, c'est rendre les données utiles aux métiers.</strong></p>
+        <p>La seconde, c'est <strong>qui</strong> l'a fait. Un exploitant de Tours, et un cabinet de treize personnes de Tours. Pas un grand programme national. Ce qu'on vient d'entendre est sorti de l'écosystème numérique de cette région — <strong>Digital Loire Valley</strong>, dont Keolis, Archery et le Groupe SNCF font partie, la CCI, tous ces réseaux qui font que des gens se rencontrent.</p>
+        <p>Et c'est une richesse qu'on sous-estime largement : <strong>les compétences dont on a besoin sont souvent déjà là, à vingt minutes.</strong> Encore faut-il se connaître.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="seg mine" data-i="8">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>12h12</span>
+      <span class="seg-t">
+        <h3>Questions de la salle</h3>
+        <span class="seg-meta"><span class="tag toi">Tu animes</span><span class="tag dur">11 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="say">
+        <p>On a un vrai temps devant nous, alors profitons-en. Qui a une question pour Stéphane ou pour Julien ?</p>
+      </div>
+      <div class="ask"><span>Qu'est-ce que la proximité géographique a changé concrètement dans ce projet ?</span></div>
+      <div class="ask"><span>Le plus difficile, ça a été la technique, ou se mettre d'accord sur le vocabulaire ?</span></div>
+      <div class="ask"><span>Combien de personnes, chez Keolis Tours, ont dû changer leur façon de travailler ?</span></div>
+      <div class="ask"><span>Qui, ici, a un projet bloqué non pas par la technologie, mais par un désaccord entre services ?</span></div>
+      <div class="ask"><span>Et qui travaille déjà avec un acteur numérique de la région ?</span></div>
+    </div>
+  </article>
+
+  <article class="seg mine" data-i="9">
+    <div class="seg-head" role="button" tabindex="0">
+      <span class="clk" data-clk>12h23</span>
+      <span class="seg-t">
+        <h3>Passation</h3>
+        <span class="seg-meta"><span class="tag toi">Toi</span><span class="tag dur">2 min</span></span>
+      </span>
+      <span class="chev">›</span>
+    </div>
+    <div class="seg-body">
+      <div class="say">
+        <p>Merci à <strong>Stéphane Grignon-Ragot</strong> pour Keolis Tours et à <strong>Julien Rigaud</strong> pour Archery Data &amp; Analytics. Ils restent parmi nous pendant le cocktail.</p>
+        <p>Je passe la parole à <strong>Jean-Luc Bouhadana</strong>, Directeur Régional SNCF Gares &amp; Connexions, pour le mot de conclusion.</p>
+      </div>
+    </div>
+  </article>
+
+  <div class="end">
+    <div class="h">12h25 · fin</div>
+    <div class="p">Mot de conclusion, puis cocktail déjeunatoire à 12h30.</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* Durées en minutes, dans l'ordre des segments.
+     Modifier ici suffit : tous les horaires se recalculent. */
+  var DUR   = [2,1,5,3,6,1,3,1,11,2];
+  var BASE  = 11*60 + 50;
+  var TOTAL = DUR.reduce(function(a,b){ return a+b; }, 0);
+  var KEY   = "conducteur-17sep-v2";
+
+  var segs = Array.prototype.slice.call(document.querySelectorAll(".seg"));
+  var offset = 0;
+  var state = {};
+
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){ state = JSON.parse(raw) || {}; }
+  }catch(e){ state = {}; }
+  if(typeof state.offset === "number" && isFinite(state.offset)){ offset = state.offset; }
+
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  function bounds(){
+    var out = [], t = BASE + offset;
+    for(var i=0;i<DUR.length;i++){ out.push([t, t+DUR[i]]); t += DUR[i]; }
+    return out;
+  }
+
+  function fmt(m){
+    m = ((m % 1440) + 1440) % 1440;
+    var h = Math.floor(m/60), mn = m%60;
+    return h + "h" + (mn<10 ? "0"+mn : mn);
+  }
+
+  function paintTimes(){
+    var b = bounds();
+    segs.forEach(function(s,i){
+      var el = s.querySelector("[data-clk]");
+      if(el && b[i]){ el.textContent = fmt(b[i][0]); }
+    });
+    var e = document.querySelector(".end .h");
+    if(e){ e.textContent = fmt(BASE + offset + TOTAL) + " · fin"; }
+    var f = document.querySelector(".fact.hot");
+    if(f){ f.textContent = fmt(BASE + offset) + " → " + fmt(BASE + offset + TOTAL); }
+  }
+
+  function setOpen(seg, open){ seg.setAttribute("data-open", open ? "1" : "0"); }
+
+  segs.forEach(function(s){
+    var head = s.querySelector(".seg-head");
+    function toggle(){ setOpen(s, s.getAttribute("data-open") !== "1"); }
+    head.addEventListener("click", toggle);
+    head.addEventListener("keydown", function(ev){
+      if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); toggle(); }
+    });
+  });
+
+  var allOpen = false;
+  var btnAll = document.getElementById("toggleAll");
+  btnAll.addEventListener("click", function(){
+    allOpen = !allOpen;
+    segs.forEach(function(s){ setOpen(s, allOpen); });
+    btnAll.textContent = allOpen ? "Tout fermer" : "Tout ouvrir";
+  });
+
+  var clockEl = document.getElementById("clock");
+  var nowEl   = document.getElementById("nowseg");
+  var jumped  = false;
+
+  function tick(){
+    var d = new Date();
+    var nowM = d.getHours()*60 + d.getMinutes();
+    clockEl.textContent = fmt(nowM);
+
+    var b = bounds(), live = -1;
+    for(var i=0;i<b.length;i++){
+      if(nowM >= b[i][0] && nowM < b[i][1]){ live = i; break; }
+    }
+
+    segs.forEach(function(s,i){
+      if(i === live){ s.classList.add("live"); } else { s.classList.remove("live"); }
+    });
+
+    if(live >= 0){
+      var titre = segs[live].querySelector("h3").textContent;
+      var reste = b[live][1] - nowM;
+      nowEl.textContent = titre + " · " + reste + " min restantes";
+      if(!jumped){
+        segs.forEach(function(s,i){ setOpen(s, i === live); });
+        try{ segs[live].scrollIntoView({block:"center"}); }catch(e){}
+        jumped = true;
+      }
+    } else if(nowM < b[0][0]){
+      var dl = b[0][0] - nowM;
+      nowEl.textContent = dl > 120 ? "Départ à " + fmt(b[0][0]) : "Départ dans " + dl + " min";
+    } else {
+      nowEl.textContent = "Séquence terminée";
+    }
+  }
+
+  document.getElementById("recal").addEventListener("click", function(){
+    var d = new Date();
+    offset = (d.getHours()*60 + d.getMinutes()) - BASE;
+    state.offset = offset;
+    save();
+    jumped = false;
+    paintTimes();
+    tick();
+  });
+
+  paintTimes();
+  tick();
+  setInterval(tick, 15000);
+})();
+</script>
+</body>
+</html>
