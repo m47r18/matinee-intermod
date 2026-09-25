@@ -43,10 +43,11 @@ body{font-family:'Avenir',system-ui,sans-serif;font-weight:300;font-size:16px;li
 
 /* ---------- disposition ---------- */
 main{max-width:500px;margin:0 auto;padding:18px 14px 48px;display:flex;flex-direction:column;gap:16px}
+.col{display:contents}
 
-main>.card{counter-increment:step;position:relative}
+main .card{counter-increment:step;position:relative}
 main{counter-reset:step}
-main>.card::before{
+main .card::before{
   content:counter(step);position:absolute;top:-11px;left:16px;
   width:24px;height:24px;border-radius:50%;background:var(--p);color:#fff;
   font-size:12px;font-weight:700;display:grid;place-items:center;
@@ -178,4 +179,23 @@ canvas#ticket{
   .card{padding:17px 14px 15px}
   .mic{width:84px;height:84px}
   .mic .ico{font-size:26px}
+}
+
+/* ---------- tablette / desktop : deux colonnes (saisie | résultats) ---------- */
+@media (min-width:900px){
+  .top,.ctx{padding-left:calc((100vw - 900px) / 2 + 16px);padding-right:calc((100vw - 900px) / 2 + 16px)}
+  main{
+    max-width:900px;display:flex;flex-direction:row;align-items:flex-start;
+    gap:22px;padding:26px 16px 60px;
+  }
+  .col{display:flex;flex-direction:column;gap:16px}
+  .col-input{flex:0 0 340px;position:sticky;top:96px}
+  .col-output{flex:1 1 0;min-width:0}
+  .mic{width:104px;height:104px}
+  .mic .ico{font-size:32px}
+}
+@media (min-width:1180px){
+  .top,.ctx{padding-left:calc((100vw - 1080px) / 2 + 16px);padding-right:calc((100vw - 1080px) / 2 + 16px)}
+  main{max-width:1080px;gap:28px}
+  .col-input{flex-basis:380px}
 }
