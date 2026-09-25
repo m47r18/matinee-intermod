@@ -58,6 +58,10 @@ const VIDE = () => ({ de:'', vers:'', quand:'', avec:'', type:'', velo:'', num:'
 let F = VIDE(), touched = new Set(), transcript = '', sols = [], sel = -1, conseils = {}, lastVers = '', plusDeTrain = false;
 let off = {}, story = null, storyBusy = false; // extras : items décochés par l'agent, histoire générée
 let veloLive = null; // disponibilités véloparcs (Nantes Métropole, temps réel) fusionnées par nom
+/* Les pastilles ne sont pas un formulaire exhaustif : la première écoute décide lesquelles sont utiles. */
+let premiereAnalyse = true;
+let choixVisibles = { type:new Set(), velo:new Set(), num:new Set(), besoins:new Set() };
+function revelerChoix(k,v){ if(choixVisibles[k] && v) choixVisibles[k].add(v); }
 async function loadVeloparcs(){
   try{ const r=await fetch(ODS+"244400404_parking-velos-nantes-metropole-disponibilites/records?where=within_distance(geometrie%2Cgeom'POINT(-1.5423%2047.2173)'%2C900m)&limit=30");
     const j=await r.json(); veloLive={}; for(const x of j.results||[]) veloLive[x.name]=x; renderExtras(); ticket(); }
@@ -138,7 +142,7 @@ function heuristique(t){
   return { vers:m?m[1]:'', velo:/vélo|velo/i.test(t)?'oui':'', type:/enfant|famille/i.test(t)?'famille':/touris|vacances|hôtel/i.test(t)?'touriste':/boulot|travail|tous les jours/i.test(t)?'quotidien':'', num:/pas de téléphone|papier/i.test(t)?'ko':'', quand:(t.match(/avant \d{1,2}\s?h(?:\d{2})?|demain[^,.]*|dans \d+ ?h[^,.]*/i)||[''])[0], avec:/enfant/i.test(t)?'enfants':/bagage/i.test(t)?'bagages':'', de:'', besoins:b, resume:t.slice(0,120) };
 }
 const BESOINS=['hebergement','garer','attente','histoire','bagages','ville'];
-function addBesoin(b,why){ if(touched.has('besoins')||F.besoins.includes(b)) return false; F.besoins.push(b); if(why) toast(why); return true; }
+function addBesoin(b,why){ if(touched.has('besoins')||F.besoins.includes(b)) return false; F.besoins.push(b); revelerChoix('besoins',b); if(why) toast(why); return true; }
 const comprendreDebounced=debounce(comprendre,1800);
 async function comprendre(){
   const t=(transcript+' '+finals).trim(); if(!t) return;
@@ -146,6 +150,11 @@ async function comprendre(){
   let a;
   try{ a=await llmJSON(SYS,t,400); state('stFiche','rempli par l\'IA — vérifiez','ok'); }
   catch(e){ a=heuristique(t); state('stFiche','sans IA : '+e.message,'ko'); }
+  if(premiereAnalyse){
+    ['type','velo','num'].forEach(k=>revelerChoix(k,a[k]));
+    (a.besoins||[]).filter(x=>BESOINS.includes(x)).forEach(x=>revelerChoix('besoins',x));
+    premiereAnalyse=false;
+  }
   for(const k of Object.keys(F)){ if(touched.has(k)||!a[k]) continue; if(k==='besoins'){ (a.besoins||[]).filter(x=>BESOINS.includes(x)).forEach(x=>addBesoin(x)); } else F[k]=a[k]; }
   autoBesoins();
   renderFiche(true);
@@ -160,7 +169,10 @@ function autoBesoins(){
 }
 function renderFiche(fromAI=false){
   for(const k of ['de','vers','quand','avec']){ const i=$('f_'+k); if(i.value!==F[k]){ i.value=F[k]; i.classList.toggle('ai',fromAI&&!!F[k]&&!touched.has(k)); } }
-  document.querySelectorAll('.chips').forEach(c=>{ const k=c.dataset.k, multi=c.classList.contains('multi'); c.querySelectorAll('button').forEach(b=>{ const onB=multi?F.besoins.includes(b.dataset.v):b.dataset.v===F[k]; b.classList.toggle('on',onB); b.classList.toggle('ai',fromAI&&onB&&!touched.has(k)); }); });
+  document.querySelectorAll('.chips').forEach(c=>{ const k=c.dataset.k, multi=c.classList.contains('multi'); let count=0;
+    c.querySelectorAll('button').forEach(b=>{ const onB=multi?F.besoins.includes(b.dataset.v):b.dataset.v===F[k]; const visible=choixVisibles[k]?.has(b.dataset.v)||onB; b.classList.toggle('hidden',!visible); b.classList.toggle('on',onB); b.classList.toggle('ai',fromAI&&onB&&!touched.has(k)); if(visible) count++; });
+    c.classList.toggle('hidden',count===0);
+  });
 }
 document.querySelectorAll('.f input').forEach(i=>i.onchange=()=>{ const k=i.dataset.k; F[k]=i.value.trim(); touched.add(k); i.classList.remove('ai'); if(k==='vers') solutions(); else { autoBesoins(); renderFiche(); renderExtras(); ticket(); } });
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{
@@ -323,7 +335,7 @@ async function printCanvas(c, quoi='ticket'){
   }catch(e){ btChar=null; state('stTick','impression impossible : '+e.message,'ko'); }
 }
 $('btnPrint').onclick=()=>printCanvas($('ticket'),'ticket');
-$('btnReset').onclick=()=>{ F=VIDE(); touched=new Set(); transcript=''; finals=''; sols=[]; sel=-1; conseils={}; lastVers=''; plusDeTrain=false; off={}; story=null; storyBusy=false; $('live').textContent=''; renderFiche(); renderSols(); renderExtras(); ticket(); state('stFiche',''); state('stSols',''); window.scrollTo(0,0); };
+$('btnReset').onclick=()=>{ F=VIDE(); touched=new Set(); transcript=''; finals=''; sols=[]; sel=-1; conseils={}; lastVers=''; plusDeTrain=false; off={}; story=null; storyBusy=false; premiereAnalyse=true; choixVisibles={ type:new Set(), velo:new Set(), num:new Set(), besoins:new Set() }; $('live').textContent=''; renderFiche(); renderSols(); renderExtras(); ticket(); state('stFiche',''); state('stSols',''); window.scrollTo(0,0); };
 
 /* ================= CONFIG ================= */
 function ctx(){ const d=now(); $('ctx').textContent=`${p2(d.getHours())}:${p2(d.getMinutes())}${cfg.heure?' (simulé)':''}${cfg.incident?' · '+INCIDENT.texte+' (simulé)':''}`; }
