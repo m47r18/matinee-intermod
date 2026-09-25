@@ -173,6 +173,16 @@ function renderFiche(fromAI=false){
     c.querySelectorAll('button').forEach(b=>{ const onB=multi?F.besoins.includes(b.dataset.v):b.dataset.v===F[k]; const visible=choixVisibles[k]?.has(b.dataset.v)||onB; b.classList.toggle('hidden',!visible); b.classList.toggle('on',onB); b.classList.toggle('ai',fromAI&&onB&&!touched.has(k)); if(visible) count++; });
     (c.closest('.grp')||c).classList.toggle('hidden',count===0);
   });
+  renderSum();
+}
+/* barre collante mobile : rappelle le trajet en cours quand la fiche a défilé hors écran */
+function renderSum(){
+  const box=$('sum'); if(!box) return;
+  if(!F.vers){ box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  $('sumRoute').textContent=(F.de||'Nantes')+' → '+F.vers;
+  const bits=[]; if(F.quand) bits.push(F.quand); if(F.avec) bits.push(F.avec); if(F.besoins.length) bits.push(F.besoins.length+' besoin'+(F.besoins.length>1?'s':''));
+  $('sumMeta').textContent=bits.join(' · ');
 }
 document.querySelectorAll('.f input').forEach(i=>i.onchange=()=>{ const k=i.dataset.k; F[k]=i.value.trim(); touched.add(k); i.classList.remove('ai'); if(k==='vers') solutions(); else { autoBesoins(); renderFiche(); renderExtras(); ticket(); } });
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{
@@ -227,7 +237,16 @@ function renderSols(){
   const box=$('sols');
   if(!sols.length){ box.innerHTML=`<p class="muted">${F.vers?'Aucun trajet trouvé — orienter vers l\'accueil.':'Dès que la destination est connue, les trajets s\'affichent ici.'}</p>`; return; }
   const vb=o=>o.velo==='oui'?'<span class="badge ok">🚲 accepté</span>':o.velo==='non'?'<span class="badge ko">🚲 refusé</span>':'<span class="badge warn">🚲 résa</span>';
-  box.innerHTML=sols.map((o,i)=>`<div class="sol ${i===sel?'on':''} ${o.ex?'ex':''}" data-i="${i}"><div><b>${esc(o.titre)}</b><small>${o.corr?o.corr+' correspondance'+(o.corr>1?'s':''):'direct'} · ${esc(o.detail)} · ${esc(o.source)}${o.ex?' · <b>écarté : '+esc(o.ex)+'</b>':''}</small>${conseils[i]?`<small>💡 ${esc(conseils[i])}</small>`:''}</div>${vb(o)}</div>`).join('');
+  const note=(o,i)=>{
+    if(o.ex) return `<span class="why">Écarté : ${esc(o.ex)}</span>`;
+    let s=`${o.corr?o.corr+' correspondance'+(o.corr>1?'s':''):'Direct'} · ${o.detail} · ${o.source}`;
+    if(conseils[i]) s+=` · 💡 ${conseils[i]}`;
+    return esc(s);
+  };
+  box.innerHTML=sols.map((o,i)=>`<button type="button" class="sol ${i===sel?'on':''} ${o.ex?'ex':''}" data-i="${i}" aria-pressed="${i===sel}">
+    <span class="r1"><b>${esc(o.demain?'Demain '+o.depart:o.depart)}</b><svg class="to" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><b>${esc(o.arrivee)}</b><em>${o.duree} min</em>${vb(o)}</span>
+    <span class="r3"><span class="note">${note(o,i)}</span><i class="rad" aria-hidden="true"></i></span>
+  </button>`).join('');
   box.querySelectorAll('.sol').forEach(el=>el.onclick=()=>{ sel=+el.dataset.i; autoBesoins(); renderFiche(); renderSols(); renderExtras(); ticket(); });
 }
 
@@ -338,7 +357,13 @@ $('btnPrint').onclick=()=>printCanvas($('ticket'),'ticket');
 $('btnReset').onclick=()=>{ F=VIDE(); touched=new Set(); transcript=''; finals=''; sols=[]; sel=-1; conseils={}; lastVers=''; plusDeTrain=false; off={}; story=null; storyBusy=false; premiereAnalyse=true; choixVisibles={ type:new Set(), velo:new Set(), num:new Set(), besoins:new Set() }; $('live').textContent=''; renderFiche(); renderSols(); renderExtras(); ticket(); state('stFiche',''); state('stSols',''); window.scrollTo(0,0); };
 
 /* ================= CONFIG ================= */
-function ctx(){ const d=now(); $('ctx').textContent=`${p2(d.getHours())}:${p2(d.getMinutes())}${cfg.heure?' (simulé)':''}${cfg.incident?' · '+INCIDENT.texte+' (simulé)':''}`; }
+function ctx(){
+  const d=now(), parts=[];
+  if(cfg.incident) parts.push(INCIDENT.texte);
+  if(cfg.heure) parts.push(`Heure simulée : ${p2(d.getHours())}:${p2(d.getMinutes())}`);
+  $('ctx').classList.toggle('hidden', !parts.length);
+  $('ctxTxt').textContent=parts.join(' · ');
+}
 function showProvider(){ const p=$('c_provider').value; $('cfg_sncfgpt').classList.toggle('hidden',p!=='sncfgpt'); $('cfg_anthropic').classList.toggle('hidden',p!=='anthropic'); }
 function fillCfg(){
   $('c_provider').value=cfg.provider; $('c_gptKey').value=cfg.gptKey; setModel(cfg.gptModel);
@@ -365,5 +390,6 @@ $('btnSave').onclick=async()=>{
 $('btnClear').onclick=()=>{ if(!confirm('Effacer les clés de ce navigateur ?')) return; cfg.anthropic=''; cfg.gptKey=''; cfg.navitia=''; save('papyrus.cfg',cfg); fillCfg(); toast('Clés effacées.'); };
 
 /* ================= init ================= */
+$('btnSumFull').onclick=()=>$('ficheCard').scrollIntoView({behavior:'smooth',block:'start'});
 fillCfg(); renderFiche(); renderSols(); renderExtras(); ticket(); loadVeloparcs();
 if(!cfg.navitia && !hasIA()) $('cfg').classList.remove('hidden');

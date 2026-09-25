@@ -6,15 +6,19 @@
 <meta name="theme-color" content="#0a0a0a">
 <meta name="description" content="PAPYRUS — le copilote des agents en gare de Nantes.">
 <title>PAPYRUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="top">
-  <div class="brand"><span class="logo">P</span><div><b>PAPYRUS</b><small>Gare de Nantes</small></div></div>
+  <div class="brand"><span class="logo">p</span><div><b>papyrus</b><small>Gare de Nantes</small></div></div>
   <button class="icon" id="btnCfg" title="Configuration" aria-label="Configuration">⚙</button>
 </header>
-<div class="ctx" id="ctx"></div>
+<div class="alert hidden" id="ctx"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.01"/></svg><span id="ctxTxt"></span></div>
+<div class="sum hidden" id="sum"><div><b id="sumRoute"></b><small id="sumMeta"></small></div><button type="button" class="rt" id="btnSumFull">Fiche complète</button></div>
 
 <main>
 
@@ -33,7 +37,7 @@
   </section>
 
   <!-- 2. FICHE -->
-  <section class="card">
+  <section class="card" id="ficheCard">
     <div class="head"><h2>Voyageur</h2><span class="state" id="stFiche"></span></div>
     <div class="route">
       <div class="rl" aria-hidden="true"><i class="o"></i><i class="l"></i><i class="d"></i></div>
