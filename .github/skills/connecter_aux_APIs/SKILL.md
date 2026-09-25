@@ -1,14 +1,11 @@
-# Kit API — sujet « continuité train + vélo »
-
+---
+name: connecterauxapis
+description: Créer une connexion aux APIs pour récupérer des informations sur les transports, les hôtels, les consignes, les réparateurs de vélos et les solutions de mobilité.
+---
 Tout ce qu'il faut pour brancher un prototype sur des données réelles le 25/09, sans perdre la matinée à chercher où sont les endpoints. Ce document ne décrit aucune application : il décrit des sources. Ce que vous en faites vous appartient.
 
-Trois choses à savoir avant de commencer. Aucune source de ce kit n'a besoin de backend : tout répond en CORS depuis une page statique, donc un `index.html` posé sur GitHub Pages suffit. Une seule demande une clé, l'API SNCF / Navitia, et cette clé se colle dans le navigateur. Et la donnée centrale du sujet, le nombre de places vélo libres dans un train, **n'existe dans aucune source publique** : c'est le point dur, il est documenté en fin de document plutôt que caché.
 
-Premier geste conseillé le matin : ouvrir `kit/banc-dessai.html`, coller le token, cliquer les sept boutons. En deux minutes vous savez ce qui répond et ce qui est tombé. La plomberie correspondante est dans `kit/data-sources.js`, commentée fonction par fonction.
-
----
-
-## 1. API SNCF / Navitia — trains, horaires, perturbations
+# Liste des APIs vers lesquelles se connecter
 
 | | |
 |---|---|
@@ -21,7 +18,7 @@ Premier geste conseillé le matin : ouvrir `kit/banc-dessai.html`, coller le tok
 
 Couverture accessible avec le jeton : `sncf`, soit les trains SNCF (TGV INOUI, OUIGO, Intercités, TER, Transilien en théorique). Pas de bus urbain, pas de car interurbain, pas de vélo.
 
-### Chercher une gare
+## Chercher une gare
 
 ```
 GET /coverage/sncf/places?q=Nantes&type[]=stop_area&count=8
@@ -33,7 +30,7 @@ Le point important : `id` a la forme `stop_area:SNCF:87481002` et se réutilise 
 
 UIC utiles sur les trois territoires : Nantes `87481002`, Rennes `87471003`, Angers Saint-Laud `87484006`, Le Mans `87396002`, Saint-Nazaire `87481200`, Tours `87571000`, Orléans `87543009`, Quimper `87474858`, Brest `87474007`, La Roche-sur-Yon `87481838`. À confirmer d'un appel `places` — ce sont des repères, pas un référentiel.
 
-### Calculer un itinéraire
+## Calculer un itinéraire
 
 ```
 GET /coverage/sncf/journeys
@@ -51,7 +48,7 @@ Réponse : `journeys[]` avec `duration` (secondes), `nb_transfers`, `departure_d
 
 Deux paramètres prêtent à confusion. `first_section_mode[]=bike|bss|walking` et `last_section_mode[]=bike|bss|walking` gèrent le vélo **pour rejoindre ou quitter la gare**, pas le vélo embarqué dans le train. Sur la couverture `sncf` ils ne servent donc qu'entre une adresse et une gare. Et `co2_emission` change d'unité d'une section à l'autre (`g CO₂e/passenger`, `gEC`) : à vérifier avant tout cumul.
 
-### Prochains départs d'une gare
+## Prochains départs d'une gare
 
 ```
 GET /coverage/sncf/stop_areas/stop_area:SNCF:87481002/departures
@@ -60,7 +57,7 @@ GET /coverage/sncf/stop_areas/stop_area:SNCF:87481002/departures
 
 `departures[]` avec `stop_date_time.departure_date_time` et `base_departure_date_time` : le retard se lit dans l'écart.
 
-### Perturbations
+## Perturbations
 
 ```
 GET /coverage/sncf/stop_areas/stop_area:SNCF:87481002/traffic_reports
@@ -71,9 +68,8 @@ Un tableau `disruptions` vide signifie qu'il n'y a rien en cours, pas que l'appe
 
 Autres endpoints disponibles sous `/coverage/sncf/` : `stop_schedules`, `route_schedules`, `terminus_schedules`, `places_nearby`, `isochrones`, `equipment_reports`, `vehicle_journeys`, `line_reports`, `pt_objects`, `addresses`, `coords`, `poi`. La liste complète a été relevée le 14/09.
 
----
 
-## 2. SNCF Open Data — gares, stationnement vélo, accessibilité
+## SNCF Open Data — gares, stationnement vélo, accessibilité
 
 | | |
 |---|---|
@@ -85,7 +81,7 @@ Autres endpoints disponibles sous `/coverage/sncf/` : `stop_schedules`, `route_s
 
 Le filtre utilise ODSQL, passé en paramètre `where` : `where=code_gare="NTS"`, `where=nom like "Nantes"`, `where=codes_uic in ("87481002","87471003")`. Ajoutez `select` pour ne ramener que les champs utiles et `limit` pour borner (100 maximum par page).
 
-### Référentiel des gares — `gares-de-voyageurs`
+## Référentiel des gares — `gares-de-voyageurs`
 
 2 782 gares, mise à jour quotidienne. Champs utiles : `id` (UUID), `nom`, `libellecourt` (le trigramme, `NTS` pour Nantes), `codes_uic`, `segment_drg` (A, B ou C selon la taille), `position_geographique` (`{lon, lat}`), `codeinsee`.
 
@@ -107,7 +103,7 @@ GET /gares-de-voyageurs/records?where=codes_uic%3D%2287481002%22&limit=1
 
 Pour Nantes : `id` = `77474ee2-1c30-4740-a579-b52c2bc74d89`, UIC `87481002`, trigramme `NTS`, segment A, position `-1.542356 / 47.216148`.
 
-### Stationnement vélo sécurisé — `stationnement-securise-velo-en-gare-au-30-06-24`
+## Stationnement vélo sécurisé — `stationnement-securise-velo-en-gare-au-30-06-24`
 
 ```
 GET /stationnement-securise-velo-en-gare-au-30-06-24/records?where=code_gare%3D%22NTS%22&limit=1
@@ -117,21 +113,19 @@ Champs : `code_gare`, `nombre_places_au_06_24`, `nombre_places_au_12_24`, `gare_
 
 Deux limites à dire à l'écran si vous affichez ce chiffre : c'est un **nombre de places**, jamais une disponibilité, et la donnée est **statique**, dernière valeur au 31/12/2024. Repères Pays de la Loire au 12/24 : Nantes 883 (objectif LOM 640), Angers Saint-Laud 299, Le Mans 260, Savenay 122, Clisson 96, La Roche-sur-Yon 80, Ancenis 68, Saumur 64, La Baule 62, Saint-Nazaire 56, Sablé 53, Cholet 48, Pontchâteau 43, Laval 40, Sainte-Pazanne 40.
 
-### État des ascenseurs et escalators — `etat-fonctionnement-elevatique-gare`
+## État des ascenseurs et escalators — `etat-fonctionnement-elevatique-gare`
 
 2 668 équipements, mise à jour horaire côté source. Champs : `libelle` (« ascenseur - Quai B »), `localisationdescriptive` (« mezzanine / Voies 2 et 3 »), `etat_de_fonctionnement` (`OK`, `KO`, `INCONNU` ou vide), `position_geographique`.
 
 Utile ici parce qu'un ascenseur en panne, avec un vélo chargé, change la faisabilité d'un parcours en gare. Attention, `position_geographique` est annoncée comme supprimée d'ici fin été 2026 (bascule NeTEx) : vérifiez sa présence la veille, et prévoyez de vous rabattre sur `localisationdescriptive` en texte.
 
-### Assistance en gare — `assistance-psh-pmr`
+## Assistance en gare — `assistance-psh-pmr`
 
 Champs : `typepriseencharge` (« RESERVE ET SPONTANE »), `typetarification` (« GRATUIT »), `lieurendezvousgare`, `horaires_jour_nominal`, `premierauderniertrain`, `datestatut`. Information affichable telle quelle ; ne construisez pas un déclenchement d'assistance, ce n'est pas un canal opérationnel.
 
 Autres jeux repérés dans l'audit : `equipements-accessibilite-en-gare`, `equipements-accessibilite-sncf`, `accessibilite_gares`, `accompagnement-pmr-gares`. Voir `docs/api-et-datasets.md` §2.5 et §2.6.
 
----
-
-## 3. Vélos en libre-service — GBFS
+## Vélos en libre-service — GBFS
 
 | | |
 |---|---|
@@ -158,9 +152,8 @@ Autres flux GBFS repérés sur Nantes Métropole, non testés : micromobilité N
 
 **À chercher le jour J** : un flux GBFS public existe-t-il pour Rennes (vélo STAR), Angers, Le Mans, Tours, Orléans ? Cherchez sur `transport.data.gouv.fr` (filtre « vélos en libre-service ») ou dans le catalogue `github.com/MobilityData/gbfs`. Le registre `DS.GBFS_CONNUS` est prévu pour être complété. Une ville sans flux n'est pas un bug : c'est une limite à afficher honnêtement.
 
----
 
-## 4. Itinéraire vélo — OSRM
+## Itinéraire vélo — OSRM
 
 | | |
 |---|---|
@@ -184,9 +177,8 @@ Repli si l'instance tombe : distance à vol d'oiseau (`DS.distanceM`), × 1,3 en
 
 Alternative citée par Bertrand Billoud : **Valhalla**, open source, plus riche (dénivelé, profils cyclables), mais à héberger — hors budget d'une journée, et l'intégration par Hove n'est pas gratuite.
 
----
 
-## 5. Sources complémentaires, non branchées
+## Sources complémentaires
 
 **Base Adresse Nationale** — `https://api-adresse.data.gouv.fr/search/?q=...` — sans clé, CORS OK, licence ouverte. Utile pour partir d'une adresse plutôt que d'une gare. Le GeoJSON renvoie `coordinates` en `[lon, lat]`, dans cet ordre.
 
@@ -200,21 +192,117 @@ Alternative citée par Bertrand Billoud : **Valhalla**, open source, plus riche 
 
 **Horaires et temps réel SNCF sans clé** — GTFS (validité 2026-09-09 → 2027-02-28), GTFS-RT protobuf (`trip-updates`, `service-alerts`) et SIRI Lite XML via `proxy.transport.data.gouv.fr`, CORS OK. Le protobuf demande une bibliothèque de décodage côté client (`gtfs-realtime-bindings`) : plus lourd que Navitia, mais sans clé. Plan de repli si le jeton Navitia pose problème.
 
+
+## Mode opératoire générique de connexion à une API
+
+### 1. Lire le contrat de l'API
+
+Avant de coder, relever la base URL, les endpoints, la méthode HTTP, les paramètres obligatoires, le format de réponse, l'authentification, les quotas, le CORS, la licence et la fraîcheur des données. Identifier aussi les champs nécessaires au besoin métier et la clé qui permet de relier les réponses entre elles.
+
+### 2. Isoler la configuration
+
+Centraliser les URLs et les options dans une configuration dédiée. Ne jamais commiter une clé, un token ou un mot de passe. Pour un prototype navigateur, demander la clé à l'utilisateur, la conserver uniquement localement si nécessaire et ne jamais lui donner de droits sensibles.
+
+```js
+const API_CONFIG = {
+    baseUrl: 'https://api.example.com/v1',
+    timeoutMs: 8000
+};
+
+const apiToken = localStorage.getItem('apiToken');
+```
+
+### 3. Construire la requête
+
+Utiliser `URL` et `URLSearchParams` pour encoder les paramètres. Utiliser les en-têtes prévus par le contrat (`Accept`, `Content-Type`, `Authorization`) et respecter la méthode HTTP attendue. Ne jamais concaténer directement des valeurs utilisateur dans une URL ou une requête.
+
+```js
+function buildUrl(path, params = {}) {
+    const url = new URL(path, `${API_CONFIG.baseUrl}/`);
+    Object.entries(params).forEach(([name, value]) => {
+        if (value !== undefined && value !== null) url.searchParams.set(name, value);
+    });
+    return url;
+}
+```
+
+### 4. Centraliser l'appel réseau
+
+Un wrapper commun doit gérer le timeout, les erreurs HTTP, le décodage du format annoncé et les réponses vides. Ne pas considérer une liste vide comme une erreur : elle peut signifier qu'aucun résultat n'est disponible.
+
+```js
+async function requestJson(path, options = {}) {
+    const controller = new AbortController();
+    const timeout = setTimeout(
+        () => controller.abort(),
+        options.timeoutMs ?? API_CONFIG.timeoutMs
+    );
+
+    try {
+        const response = await fetch(buildUrl(path, options.params), {
+            method: options.method ?? 'GET',
+            signal: controller.signal,
+            headers: {
+                Accept: 'application/json',
+                ...options.headers
+            },
+            body: options.body
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+    } finally {
+        clearTimeout(timeout);
+    }
+}
+```
+
+### 5. Authentifier selon le contrat
+
+Appliquer le mécanisme documenté par l'API : clé dans un en-tête, Bearer token, HTTP Basic ou paramètre de requête. Ne pas inventer de méthode d'authentification et ne pas afficher le secret dans les logs, les messages d'erreur ou l'interface.
+
+```js
+const response = await requestJson('/resource', {
+    headers: { Authorization: `Bearer ${apiToken}` },
+    params: { limit: 20 }
+});
+```
+
+### 6. Valider et normaliser la réponse
+
+Vérifier la présence du statut annoncé par l'API, du tableau ou de l'objet attendu et des champs indispensables. Convertir les dates, coordonnées, durées et unités à un format interne unique. Préserver les informations de fraîcheur et de source pour les afficher avec le résultat.
+
+```js
+function normalizeItems(payload) {
+    if (!Array.isArray(payload.items)) return [];
+    return payload.items.map(item => ({
+        id: String(item.id),
+        name: item.name ?? 'Sans nom'
+    }));
+}
+```
+
+### 7. Prévoir les erreurs et le repli
+
+Distinguer une erreur réseau, une erreur d'authentification, une limitation de quota, une réponse vide et une réponse invalide. Utiliser un échantillon local ou un calcul de repli documenté si la donnée réelle est indisponible, et l'indiquer explicitement comme `live`, `sample`, `empty` ou `error`.
+
+```js
+async function loadWithFallback(loadLive, sample) {
+    try {
+        return { status: 'live', data: await loadLive() };
+    } catch (error) {
+        console.warn('API indisponible, utilisation du repli', error.message);
+        return { status: 'sample', data: sample };
+    }
+}
+```
+
+### 8. Tester et documenter
+
+Tester d'abord l'endpoint avec un cas nominal, puis avec un paramètre invalide, une réponse vide, un token absent, un timeout et le réseau coupé. Vérifier le CORS depuis l'environnement réel, les quotas, les limites de pagination et les conditions de licence. Enregistrer des échantillons avant une démonstration et afficher la source, la date de mise à jour, la licence et les hypothèses. Ne jamais bloquer l'application entière sur une seule API.
+
 ---
 
-## 6. Le point dur, à ne pas contourner en silence
-
-**L'occupation des places vélo dans un train n'est disponible dans aucune source publique.** Ni dans les 166 jeux de SNCF Open Data, ni dans le GTFS SNCF (`bike_info_count = 0`, donc pas même le champ `bikes_allowed`), ni dans Navitia. Les règles d'emport (TER admis sans réservation, TGV et Intercités sur réservation payante, places limitées) vivent sur des pages éditoriales non structurées : si vous les codez, ce sont des hypothèses, à étiqueter comme telles.
-
-Conséquence pratique : tout prototype qui part d'un « il n'y a plus de place pour ton vélo » s'appuie sur un déclencheur **simulé**. Ce n'est pas un défaut du prototype, c'est le constat que le sujet met au jour — et c'est un bon contenu de restitution, à condition de le dire à l'écran plutôt que de laisser croire à du temps réel.
-
-Deux façons de rendre la simulation honnête, sans rien inventer : un bouton explicite « simuler la rupture » avec un bandeau visible, ou un déclencheur réel emprunté aux perturbations Navitia (`status`, `disruptions`), qui existent vraiment même si elles ne portent pas sur le vélo.
-
-Piste évoquée par Bertrand Billoud si quelqu'un veut creuser : des statistiques d'usage là où la réservation vélo est obligatoire, à condition qu'une source publiable existe. Non vérifié à ce jour.
-
----
-
-## 7. Règles de jeu sur les données
+## Règles de jeu sur les données
 
 Citer la source et la fraîcheur de chaque donnée affichée, avec sa licence (ODbL pour SNCF Open Data et OSM, LOv2 pour Naolib et Aléop). Distinguer à l'écran ce qui est réel, ce qui est simulé, ce qui est une hypothèse et ce qui manque. Ne jamais présenter une donnée statique de 2024 comme du temps réel. Aucun secret dans le dépôt : le token Navitia se colle dans le navigateur et reste dans le stockage local, `.env` est ignoré par Git, seul `.env.example` est versionné. Pas de donnée personnelle, pas de compte, pas de géolocalisation obligatoire. Et enregistrez vos échantillons la veille dans `data/samples/` : une API qui tombe pendant la restitution ne doit pas emporter la démo.
 
