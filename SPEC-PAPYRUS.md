@@ -1,4 +1,4 @@
-# ARIANE — Le copilote des agents en gare
+# PAPYRUS — Le copilote des agents en gare
 
 Spec fonctionnelle consolidée, Hack the Vibe — Nantes Digital Week, 25/09/2026.
 
@@ -18,7 +18,7 @@ Chaque jour, les agents en gare reçoivent des dizaines de demandes : train annu
 - **F2 — Demande et compréhension** : l'agent demande l'accord du voyageur (« je transcris notre échange pour vous aider, rien n'est enregistré »), puis dicte ou tape la demande. L'IA en extrait destination, contraintes (vélo, famille, bagages), urgence et profil. L'agent corrige si besoin.
 - **F3 — Solutions fondées sur les données** : 2 ou 3 options avec des critères lisibles (vélo accepté ou non, heure d'arrivée, correspondances, information temps réel ou théorique). Pas de score en pourcentage. L'IA ne rédige qu'à partir des données récupérées, elle n'invente aucun horaire. L'agent choisit l'option.
 - **F4 — Restitution adaptée au profil** : ticket thermique imprimé (voyageur peu à l'aise avec le numérique), QR code vers un mini-guide web (voyageur à l'aise), SMS ou mail (écran simulé). Le ticket imprimé est le moment fort de la démo.
-- **F5 — Vue d'ensemble de la gare** : ARIANE agrège les demandes de la journée (« 7 voyageurs vélo concernés par la suppression du 14h32 ») et propose un message commun : annonce, affichage, SMS groupé. C'est l'argument qui distingue ARIANE d'un simple assistant.
+- **F5 — Vue d'ensemble de la gare** : PAPYRUS agrège les demandes de la journée (« 7 voyageurs vélo concernés par la suppression du 14h32 ») et propose un message commun : annonce, affichage, SMS groupé. C'est l'argument qui distingue PAPYRUS d'un simple assistant.
 - **F6 — Attente longue (bonus)** : suggestions en ville pour une famille qui a 4 heures devant elle.
 - **F7 — Débrief de fin de journée** : l'IA présente à l'agent ce qu'elle a retenu du service (demandes récurrentes, problèmes constatés). L'agent corrige et valide, et la mémoire de la gare s'enrichit pour l'équipe suivante. Seul ce qu'un humain a validé entre en mémoire.
 
@@ -45,7 +45,7 @@ Données réelles pour Navitia, Naolib et l'open data. Seul l'incident est injec
 
 Parades prévues :
 - **Salle bruyante** : micro-cravate ou téléphone tenu près de la bouche, saisie au clavier en secours.
-- **Problème hors sujet** : ARIANE oriente vers l'accueil au lieu d'inventer une réponse.
+- **Problème hors sujet** : PAPYRUS oriente vers l'accueil au lieu d'inventer une réponse.
 - **Participant qui sèche** : fiche de cadrage avec 3 idées de problèmes.
 - **Latence** : affichage des étapes en cours.
 - **Aucune solution dans les données** : repli systématique vers l'agent humain ou l'accueil.
@@ -85,7 +85,7 @@ Inspirations : SNCF Connect, Copilot, Notion, Citymapper. Design moderne, minima
 
 ## Reste à décider
 
-- [ ] Nom définitif du produit (ARIANE est provisoire)
+- [ ] Nom définitif du produit (PAPYRUS est provisoire)
 - [ ] Imprimante achetée à la Fnac (Phomemo ou Peripage), qui fixe la solution d'impression
 - [ ] Qui fournit la clé Anthropic, et plafond de dépense
 - [ ] Claude ou autre LLM
