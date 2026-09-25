@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PAPYRUS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="logo">P</span><div><b>PAPYRUS</b><small>Gare de Nantes</small></div></div>
+  <button class="icon" id="btnCfg" title="Configuration">⚙</button>
+</header>
+<div class="ctx" id="ctx"></div>
+
+<main>
+
+  <!-- 1. ÉCOUTER -->
+  <section class="card listen">
+    <button class="mic" id="mic"><span class="ico">🎙</span><span id="micLbl">Écouter</span></button>
+    <p class="consent">À dire au voyageur : « Je transcris notre échange pour vous aider, rien n'est enregistré. »</p>
+    <p class="live" id="live"></p>
+  </section>
+
+  <!-- 2. FICHE -->
+  <section class="card">
+    <div class="head"><h2>Fiche voyageur</h2><span class="state" id="stFiche"></span></div>
+    <div class="f"><label for="f_de">Vient de</label><input id="f_de" data-k="de" placeholder="—"></div>
+    <div class="f"><label for="f_vers">Va à</label><input id="f_vers" data-k="vers" placeholder="—"></div>
+    <div class="f"><label for="f_quand">Quand</label><input id="f_quand" data-k="quand" placeholder="—"></div>
+    <div class="f"><label for="f_avec">Avec</label><input id="f_avec" data-k="avec" placeholder="enfants, bagages…"></div>
+    <div class="chips" data-k="type">
+      <button data-v="quotidien">Quotidien</button><button data-v="touriste">Touriste</button><button data-v="famille">Famille</button><button data-v="occasionnel">Occasionnel</button>
+    </div>
+    <div class="chips" data-k="velo">
+      <button data-v="oui">🚲 Vélo</button><button data-v="non">Sans vélo</button>
+    </div>
+    <div class="chips" data-k="num">
+      <button data-v="ok">📱 À l'aise numérique</button><button data-v="ko">Papier</button>
+    </div>
+    <div class="chips multi" data-k="besoins">
+      <button data-v="hebergement">🏨 Hébergement</button><button data-v="garer">🔒 Garer le vélo</button><button data-v="attente">⏳ En attendant</button><button data-v="histoire">📖 Histoire enfant</button><button data-v="bagages">🧳 Bagages</button><button data-v="ville">🗺 Ville</button>
+    </div>
+    <input id="more" class="more" placeholder="Compléter à la main, puis Entrée…">
+  </section>
+
+  <!-- 3. SOLUTIONS -->
+  <section class="card">
+    <div class="head"><h2>Solutions</h2><span class="state" id="stSols"></span></div>
+    <div id="sols" class="sols"><p class="muted">Dès que la destination est connue, les trajets s'affichent ici.</p></div>
+  </section>
+
+  <!-- 3b. EN PLUS (blocs selon besoins) -->
+  <section class="card hidden" id="extrasCard">
+    <div class="head"><h2>En plus du trajet</h2><span class="state" id="stExtras"></span></div>
+    <div id="extras" class="extras"></div>
+  </section>
+
+  <!-- 4. TICKET -->
+  <section class="card tick">
+    <div class="head"><h2>Ticket</h2><span class="state" id="stTick"></span></div>
+    <canvas id="ticket" width="384" height="120"></canvas>
+    <canvas id="ticket2" width="384" height="120" class="hidden"></canvas>
+    <button class="print" id="btnPrint" disabled>🖨 Imprimer le ticket</button>
+    <div class="row"><a id="png" class="lnk" download="ticket-papyrus.png">Enregistrer en image</a><button class="lnk" id="btnReset">Nouveau voyageur</button></div>
+  </section>
+
+</main>
+
+<!-- CONFIG -->
+<div class="sheet hidden" id="cfg">
+  <div class="card">
+    <div class="head"><h2>Configuration</h2><button class="lnk" id="btnCfgClose">Fermer</button></div>
+    <label class="lab">Fournisseur IA<select id="c_provider"><option value="sncfgpt">SNCF GPT (gateway gpt.sncf.fr)</option><option value="anthropic">Anthropic (Claude)</option></select></label>
+    <div id="cfg_sncfgpt">
+      <label class="lab">Clé API SGPT<input id="c_gptKey" type="password" placeholder="Bearer… (gardée dans ce navigateur uniquement)" autocomplete="off"></label>
+      <div class="row" style="justify-content:flex-start"><button class="lnk" id="btnModeles">Charger les modèles</button><span class="muted" id="modInfo"></span></div>
+      <label class="lab">Modèle<select id="c_gptModel"><option value="mistral-medium-2508">mistral-medium-2508 (défaut)</option></select></label>
+    </div>
+    <div id="cfg_anthropic" class="hidden">
+      <label class="lab">Clé API Anthropic<input id="c_anthropic" type="password" placeholder="sk-ant-…"></label>
+      <label class="lab">Modèle<select id="c_model"><option value="claude-sonnet-5">claude-sonnet-5 (rapide)</option><option value="claude-opus-5">claude-opus-5</option></select></label>
+    </div>
+    <label class="lab">Token Navitia<input id="c_navitia" type="password"></label>
+    <label class="lab">Heure simulée (vide = réelle)<input id="c_heure" placeholder="14:35"></label>
+    <label class="lab chk"><input type="checkbox" id="c_incident" checked> Injecter l'incident 14h32 → Pornic</label>
+    <div class="row"><button class="btn" id="btnSave">Enregistrer et tester</button><button class="lnk" id="btnClear">Effacer les clés</button></div>
+    <p class="muted" id="cfgInfo">Clés stockées uniquement dans ce navigateur. POC : pas de clé de production.</p>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<div id="qrtmp" class="hidden"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
