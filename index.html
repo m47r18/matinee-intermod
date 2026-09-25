@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#003865">
+<meta name="theme-color" content="#0a0a0a">
 <meta name="description" content="PAPYRUS — le copilote des agents en gare de Nantes.">
 <title>PAPYRUS</title>
 <link rel="stylesheet" href="style.css">
@@ -12,48 +12,72 @@
 
 <header class="top">
   <div class="brand"><span class="logo">P</span><div><b>PAPYRUS</b><small>Gare de Nantes</small></div></div>
-  <button class="icon" id="btnCfg" title="Configuration">⚙</button>
+  <button class="icon" id="btnCfg" title="Configuration" aria-label="Configuration">⚙</button>
 </header>
 <div class="ctx" id="ctx"></div>
 
 <main>
+
+<!-- ========== COLONNE 1 : LE VOYAGEUR (écouter + fiche) ========== -->
 <div class="col col-input">
 
   <!-- 1. ÉCOUTER -->
   <section class="card listen">
-    <button class="mic" id="mic"><span class="ico">🎙</span><span id="micLbl">Écouter</span></button>
-    <p class="consent">À dire au voyageur : « Je transcris notre échange pour vous aider, rien n'est enregistré. »</p>
+    <div class="lrow">
+      <button class="mic" id="mic"><span class="ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><span id="micLbl">Écouter</span></button>
+      <p class="ltxt">Le voyageur parle,<br>PAPYRUS transcrit.</p>
+      <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <p class="consent"><b>À dire au voyageur :</b> « Je transcris notre échange pour vous aider, rien n'est enregistré. »</p>
     <p class="live" id="live"></p>
   </section>
 
   <!-- 2. FICHE -->
   <section class="card">
-    <div class="head"><h2>Fiche voyageur</h2><span class="state" id="stFiche"></span></div>
-    <div class="f"><label for="f_de">Vient de</label><input id="f_de" data-k="de" placeholder="—"></div>
-    <div class="f"><label for="f_vers">Va à</label><input id="f_vers" data-k="vers" placeholder="—"></div>
-    <div class="f"><label for="f_quand">Quand</label><input id="f_quand" data-k="quand" placeholder="—"></div>
-    <div class="f"><label for="f_avec">Avec</label><input id="f_avec" data-k="avec" placeholder="enfants, bagages…"></div>
-    <div class="chips" data-k="type">
-      <button data-v="quotidien">Quotidien</button><button data-v="touriste">Touriste</button><button data-v="famille">Famille</button><button data-v="occasionnel">Occasionnel</button>
+    <div class="head"><h2>Voyageur</h2><span class="state" id="stFiche"></span></div>
+    <div class="route">
+      <div class="rl" aria-hidden="true"><i class="o"></i><i class="l"></i><i class="d"></i></div>
+      <div class="rf">
+        <div class="f"><label for="f_de">Vient de</label><input id="f_de" data-k="de" placeholder="—"></div>
+        <div class="f"><label for="f_vers">Va à</label><input id="f_vers" data-k="vers" placeholder="—"></div>
+      </div>
     </div>
-    <div class="chips" data-k="velo">
-      <button data-v="oui">🚲 Vélo</button><button data-v="non">Sans vélo</button>
+    <div class="two">
+      <div class="f"><label for="f_quand">Quand</label><input id="f_quand" data-k="quand" placeholder="—"></div>
+      <div class="f"><label for="f_avec">Avec</label><input id="f_avec" data-k="avec" placeholder="enfants, bagages…"></div>
     </div>
-    <div class="chips" data-k="num">
-      <button data-v="ok">📱 À l'aise numérique</button><button data-v="ko">Papier</button>
-    </div>
-    <div class="chips multi" data-k="besoins">
-      <button data-v="hebergement">🏨 Hébergement</button><button data-v="garer">🔒 Garer le vélo</button><button data-v="attente">⏳ En attendant</button><button data-v="histoire">📖 Histoire enfant</button><button data-v="bagages">🧳 Bagages</button><button data-v="ville">🗺 Ville</button>
-    </div>
-    <input id="more" class="more" placeholder="Compléter à la main, puis Entrée…">
+    <div class="grp"><span class="gl">Profil</span>
+      <div class="chips" data-k="type">
+        <button data-v="quotidien">Quotidien</button><button data-v="touriste">Touriste</button><button data-v="famille">Famille</button><button data-v="occasionnel">Occasionnel</button>
+      </div></div>
+    <div class="grp"><span class="gl">Vélo</span>
+      <div class="chips" data-k="velo">
+        <button data-v="oui">Avec vélo</button><button data-v="non">Sans vélo</button>
+      </div></div>
+    <div class="grp"><span class="gl">Numérique</span>
+      <div class="chips" data-k="num">
+        <button data-v="ok">À l'aise</button><button data-v="ko">Papier</button>
+      </div></div>
+    <div class="grp"><span class="gl">Besoins</span>
+      <div class="chips multi" data-k="besoins">
+        <button data-v="hebergement"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 13h18v5M21 13v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="10" r="1.5"/></svg>Hébergement</button>
+        <button data-v="garer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Garer le vélo</button>
+        <button data-v="attente"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>En attendant</button>
+        <button data-v="histoire"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg>Histoire enfant</button>
+        <button data-v="bagages"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="8" width="14" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Bagages</button>
+        <button data-v="ville"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Ville</button>
+      </div></div>
+    <input id="more" class="more" placeholder="Compléter à la main, puis Entrée…" aria-label="Compléter à la main">
   </section>
 
 </div>
+
+<!-- ========== COLONNE 2 : LES RÉSULTATS ========== -->
 <div class="col col-output">
 
   <!-- 3. SOLUTIONS -->
   <section class="card">
-    <div class="head"><h2>Solutions</h2><span class="state" id="stSols"></span></div>
+    <div class="head"><h2>Trajets</h2><span class="state" id="stSols"></span></div>
     <div id="sols" class="sols"><p class="muted">Dès que la destination est connue, les trajets s'affichent ici.</p></div>
   </section>
 
@@ -63,12 +87,18 @@
     <div id="extras" class="extras"></div>
   </section>
 
+</div>
+
+<!-- ========== COLONNE 3 : LE TICKET ========== -->
+<div class="col col-ticket">
+
   <!-- 4. TICKET -->
   <section class="card tick">
     <div class="head"><h2>Ticket</h2><span class="state" id="stTick"></span></div>
     <canvas id="ticket" width="384" height="120"></canvas>
     <canvas id="ticket2" width="384" height="120" class="hidden"></canvas>
-    <button class="print" id="btnPrint" disabled>🖨 Imprimer le ticket</button>
+    <!-- .dock : barre collée en bas sur mobile, simple bloc dans la carte dès 760 px -->
+    <div class="dock"><button class="print" id="btnPrint" disabled><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2"/><rect x="7" y="14" width="10" height="6"/></svg>Imprimer le ticket</button></div>
     <div class="row"><a id="png" class="lnk" download="ticket-papyrus.png">Enregistrer en image</a><button class="lnk" id="btnReset">Nouveau voyageur</button></div>
   </section>
 
